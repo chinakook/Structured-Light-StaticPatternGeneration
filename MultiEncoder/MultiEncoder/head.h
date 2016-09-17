@@ -8,6 +8,9 @@
 // OpenCV
 #include <opencv2/highgui/highgui.hpp>
 
+using namespace std;
+using namespace cv;
+
 static int PROJECTOR_RESLINE = 1280;
 static int PROJECTOR_RESROW = 800;
 
@@ -19,14 +22,16 @@ private:
 	int numDigit;			// 位数
 	int grayCodeSize;		// 总共的格雷码数目
 	short *grayCode;		// 格雷码
-	cv::Mat *grayCodeMat;	// 格雷码对应的图像
+	Mat *grayCodeMat;		// 格雷码对应的图像
 	int resRow;				// 图像的行分辨率
 	int resLine;			// 图像的列分辨率
 	bool lineBased;			// 是否按照列来绘制
 
-	std::string codeFileName;	// 存储格雷码的文件名
-	std::string matFileNamePre;	// 存储格雷码图像的文件名
-	std::string matFileNameEnd;	// 存储格雷码图像的后缀名
+	string m_filePath;		// 存储路径名
+	string m_codeName;		// 格雷码文件名
+	string m_codeEnd;		// 格雷码后缀名
+	string m_matName;		// 图像名
+	string m_matEnd;		// 图像后缀名
 
 	bool GetBit(short Code, int n);		// 获取Code中的右起第n位。n从1开始。
 	bool EncodeGray();					// 构建numDigit位的GrayCode并存储。
@@ -37,8 +42,8 @@ public:
 	CEncoder_Gray();										// 构造函数。
 	~CEncoder_Gray();									// 析构函数。删除分配的相关空间。
 	bool Encode(int numDigit, bool lineBased);			// 开始构建GrayCode。需要传入具体的位数。
-	bool SetCodeFileName(std::string codeFileName);		// 设定存储文件名
-	bool SetMatFileName(std::string matFileNamePre, std::string matFileNameEnd);
+	bool SetCodeFileName(string codeName, string codeEnd);		// 设定存储文件名
+	bool SetMatFileName(string filePath, string matName, string matEnd);
 	void Visualization();
 };
 
@@ -54,8 +59,9 @@ private:
 	int m_resLine;			// 图像的列分辨率
 	bool m_lineBased;		// 是否按照列来绘制
 
-	std::string m_matFileNamePre;	// 存储PS图像的文件名
-	std::string m_matFileNameEnd;	// 存储PS图像的后缀名
+	string m_filePath;		// 存储路径名
+	string m_matName;		// 图像名
+	string m_matEnd;		// 图像后缀名
 
 	bool DrawMat();						// 根据PS内容，绘制图像
 	bool WriteData();					// 输出到文件
@@ -64,6 +70,6 @@ public:
 	CEncoder_Phase();
 	~CEncoder_Phase();
 	bool Encode(int pixPeriod, bool lineBased);
-	bool SetMatFileName(std::string matFileNamePre, std::string matFileNameEnd);
+	bool SetMatFileName(string filePath, string matName, string matEnd);
 	void Visualization();
 };

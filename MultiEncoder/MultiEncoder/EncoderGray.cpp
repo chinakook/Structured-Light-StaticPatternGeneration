@@ -1,4 +1,5 @@
 #include "head.h"
+using namespace std;
 
 // 构造函数。
 CEncoder_Gray::CEncoder_Gray()
@@ -10,9 +11,11 @@ CEncoder_Gray::CEncoder_Gray()
 	this->resLine = PROJECTOR_RESLINE;
 	this->lineBased = true;
 
-	this->codeFileName = "GrayCode/GrayCode.txt";
-	this->matFileNamePre = "GrayCode/GrayMat";
-	this->matFileNameEnd = ".jpg";
+	this->m_filePath = "/";
+	this->m_codeName = "GrayCode";
+	this->m_codeEnd = ".txt";
+	this->m_matName = "Gray";
+	this->m_matEnd = ".bmp";
 }
 
 // 析构函数。删除分配的相关空间。
@@ -151,9 +154,18 @@ bool CEncoder_Gray::DrawMat()
 // 输出到文件
 bool CEncoder_Gray::WriteData()
 {
+	// 创建路径
+	string tempPath = this->m_filePath;
+	for (int i = 0; i < tempPath.length(); i++)
+	{
+		if (tempPath[i] == '/')
+			tempPath[i] = '\\';
+	}
+	system((string("mkdir ") + tempPath).c_str());
+
 	// 输出生成的GrayCode到txt
 	std::fstream txtFile;
-	txtFile.open(this->codeFileName.c_str(), std::ios::out);
+	txtFile.open((this->m_filePath + this->m_codeName + this->m_codeEnd).c_str(), ios::out);
 	if (!txtFile)
 		return false;
 	for (int i = 0; i < this->grayCodeSize; i++)
@@ -169,27 +181,8 @@ bool CEncoder_Gray::WriteData()
 		std::strstream ss;
 		ss << i;
 		ss >> tempNum;
-		cv::imwrite(this->matFileNamePre + tempNum + this->matFileNameEnd, this->grayCodeMat[i]);
+		cv::imwrite(this->m_filePath + this->m_matName + tempNum + this->m_matEnd, this->grayCodeMat[i]);
 	}
-
-	// 测试用
-	/*for (int i = 0; i < this->grayCodeSize; i++)
-	{
-		for (int d = this->numDigit; d > 0; d--)
-		{
-			std::cout << this->GetBit(this->grayCode[i], d);
-		}
-		std::cout << std::endl;
-	}
-
-	cv::namedWindow("Test");
-	for (int i = 0; i < numDigit; i++)
-	{
-		std::cout << "Now present: " << i << std::endl;
-		imshow("Test", this->grayCodeMat[i]);
-		cv::waitKey(0);
-	}
-	cv::destroyWindow("Test");*/
 
 	return true;
 }
@@ -218,17 +211,19 @@ bool CEncoder_Gray::Encode(int numDigit, bool lineBased)
 }
 
 // 设定存储格雷码数据的文件名
-bool CEncoder_Gray::SetCodeFileName(std::string codeFileName)
+bool CEncoder_Gray::SetCodeFileName(string codeName, string codeEnd)
 {
-	this->codeFileName = codeFileName;
+	this->m_codeName = codeName;
+	this->m_codeEnd = codeEnd;
 	return true;
 }
 
 // 设定存储格雷码图案的文件名
-bool CEncoder_Gray::SetMatFileName(std::string matFileNamePre, std::string matFileNameEnd)
+bool CEncoder_Gray::SetMatFileName(string filePath, string matName, string matEnd)
 {
-	this->matFileNamePre = matFileNamePre;
-	this->matFileNameEnd = matFileNameEnd;
+	this->m_filePath = filePath;
+	this->m_matName = matName;
+	this->m_matEnd = matEnd;
 	return true;
 }
 
@@ -244,12 +239,12 @@ void CEncoder_Gray::Visualization()
 		std::cout << std::endl;
 	}
 
-	cv::namedWindow(this->matFileNamePre);
+	cv::namedWindow(this->m_matName);
 	for (int i = 0; i < this->numDigit * 2; i++)
 	{
 		std::cout << "Now present: " << i << std::endl;
-		imshow(this->matFileNamePre, this->grayCodeMat[i]);
+		imshow(this->m_matName, this->grayCodeMat[i]);
 		cv::waitKey(300);
 	}
-	cv::destroyWindow(this->matFileNamePre);
+	cv::destroyWindow(this->m_matName);
 }

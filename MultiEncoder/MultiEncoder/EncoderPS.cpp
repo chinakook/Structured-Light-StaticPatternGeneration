@@ -11,9 +11,9 @@ CEncoder_Phase::CEncoder_Phase()
 	this->m_resLine = PROJECTOR_RESLINE;
 	this->m_lineBased = true;
 	
-	this->m_matFileNamePre = "PhaseShifting/PS";
-	this->m_matFileNameEnd = ".jpg";
-
+	this->m_filePath = "/";
+	this->m_matName = "Phase";
+	this->m_matEnd = ".bmp";
 }
 
 // 析构函数。删除分配的相关空间。
@@ -98,16 +98,17 @@ bool CEncoder_Phase::WriteData()
 		std::strstream ss;
 		ss << i;
 		ss >> tempNum;
-		cv::imwrite(this->m_matFileNamePre + tempNum + this->m_matFileNameEnd, this->m_PSMat[i]);
-	}
 
-	/*namedWindow("Test");
-	for (int i = 0; i < this->m_numMat; i++)
-	{
-		std::cout << "Now present: " << i << std::endl;
-		imshow("Test", this->m_PSMat[i]);
-		cv::waitKey(0);
-	}*/
+		string tempPath = this->m_filePath;
+		for (int i = 0; i < tempPath.length(); i++)
+		{
+			if (tempPath[i] == '/')
+				tempPath[i] = '\\';
+		}
+		system((string("mkdir ") + tempPath).c_str());
+
+		cv::imwrite(this->m_filePath + this->m_matName + tempNum + this->m_matEnd, this->m_PSMat[i]);
+	}
 
 	return true;
 }
@@ -133,10 +134,11 @@ bool CEncoder_Phase::Encode(int pixPeriod, bool lineBased)
 }
 
 // 设定存储格雷码图案的文件名
-bool CEncoder_Phase::SetMatFileName(std::string matFileNamePre, std::string matFileNameEnd)
+bool CEncoder_Phase::SetMatFileName(string filePath, string matName, string matEnd)
 {
-	this->m_matFileNamePre = matFileNamePre;
-	this->m_matFileNameEnd = matFileNameEnd;
+	this->m_filePath = filePath;
+	this->m_matName = matName;
+	this->m_matEnd = matEnd;
 	return true;
 }
 
@@ -145,12 +147,12 @@ void CEncoder_Phase::Visualization()
 {
 	using namespace cv;
 
-	namedWindow(this->m_matFileNamePre);
+	namedWindow(this->m_matName);
 	for (int i = 0; i < this->m_numMat; i++)
 	{
 		std::cout << "Now present: " << i << std::endl;
-		imshow(this->m_matFileNamePre, this->m_PSMat[i]);
+		imshow(this->m_matName, this->m_PSMat[i]);
 		cv::waitKey(400);
 	}
-	destroyWindow(this->m_matFileNamePre);
+	destroyWindow(this->m_matName);
 }
